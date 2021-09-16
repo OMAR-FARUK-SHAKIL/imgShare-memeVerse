@@ -24,7 +24,7 @@ class Header extends Component {
         <header>
             <div className="head-content">
                 <div className="branding">
-                    <Link to="/"><img src={logo} alt="logo" /></Link>
+                    <Link to="/"><h1>Meme-Verse</h1></Link>
                 </div>
                 <div className="nav">
                     <div className="userInfo">

@@ -1,16 +1,19 @@
 import React, { Component } from 'react';
 import '../App.css';
-import { Route, Switch, Redirect } from 'react-router-dom';
-import {setUsers, setCurrentUser, setPosts, setallComments, setSorting} from '../Actions';
+import { BrowserRouter as Router, Route, Switch, Redirect } from 'react-router-dom';
+import { setUsers, setCurrentUser, setPosts, setallComments, setSorting } from '../Actions';
+import { createContext, useState } from "react";
 import Profile from './Profile.js';
 import Home from './Home.js';
 import Photo from './Photo';
 import Login from './Login.js';
 import Comments from './Comments';
+import LogIn from '../components/Login/Login/LogIn';
+// import memeCollection from './memeCollection.json';
 
 var DefaultAvatar = 'https://i.postimg.cc/FHh1RDbt/128px-Creative-Tail-Animal-kangoroo-svg.png';
 
-
+export const UserContext = createContext();
 
 class App extends Component {
     //state = {
@@ -21,14 +24,14 @@ class App extends Component {
     //    sorting:'timestamp',
     //}
 
-    componentDidMount(){
+    componentDidMount() {
         this.loadData();
         this.store = this.props.store;
     }
 
     loadData = () => {
         //const {users,posts, allComments} = this.state;
-        const {users, posts, allComments} = this.props.store.getState();
+        const { users, posts, allComments } = this.props.store.getState();
         let user;
         let singlePost;
         let postComments;
@@ -36,35 +39,35 @@ class App extends Component {
 
         //fetch data from foursquare
         fetch(url)
-        .then((response) => {
-            response.json().then((data) => {
-                if (response.status === 200) {
-                    data.forEach((item, i) => {
-                        user = {id:item.id, name:item.name, following:item.following, followers: item.followers, avatar: item.avatar ? item.avatar : DefaultAvatar}
-                        user['liked'] = [];
-                        user['followersids'] = [];
-                        user['followingids'] = [];
-                        item.posts.forEach((post, i) => {
-                            singlePost = {id:post.id, userid:item.id, likes: post.likes, timestamp: post.timestamp, imageUrl:post.imageUrl}
-                            posts.push(singlePost);
-                            postComments = {postid:post.id, comments:post.comments ? post.comments : []}
-                            allComments.push(postComments);
+            .then((response) => {
+                response.json().then((data) => {
+                    if (response.status === 200) {
+                        data.forEach((item, i) => {
+                            user = { id: item.id, name: item.name, following: item.following, followers: item.followers, avatar: item.avatar ? item.avatar : DefaultAvatar }
+                            user['liked'] = [];
+                            user['followersids'] = [];
+                            user['followingids'] = [];
+                            item.posts.forEach((post, i) => {
+                                singlePost = { id: post.id, userid: item.id, likes: post.likes, timestamp: post.timestamp, imageUrl: post.imageUrl }
+                                posts.push(singlePost);
+                                postComments = { postid: post.id, comments: post.comments ? post.comments : [] }
+                                allComments.push(postComments);
+                            });
+                            users.push(user);
                         });
-                        users.push(user);
-                    });
-                } else {
-                    console.log('Sorry, Unable to retrieve data from API');
-                }
-            //this.setState({users,posts, allComments});
-            this.store.dispatch(setUsers(users));
-            this.store.dispatch(setPosts(posts));
-            this.store.dispatch(setallComments(allComments));
-        }).catch((error) => {
-            console.log('Call is Not Successful '+error);
-        })
-      }).catch((error) => {
-            console.log('API Not Responding'+error)
-        });
+                    } else {
+                        console.log('Sorry, Unable to retrieve data from API');
+                    }
+                    //this.setState({users,posts, allComments});
+                    this.store.dispatch(setUsers(users));
+                    this.store.dispatch(setPosts(posts));
+                    this.store.dispatch(setallComments(allComments));
+                }).catch((error) => {
+                    console.log('Call is Not Successful ' + error);
+                })
+            }).catch((error) => {
+                console.log('API Not Responding' + error)
+            });
 
     }
 
@@ -80,10 +83,10 @@ class App extends Component {
 
     updateCurrentUser = (userid) => {
         //const {users} = this.state;
-        const {users} = this.store.getState();
+        const { users } = this.store.getState();
         let newUser;
-        users.forEach((user)=>{
-            if(user.id === userid){
+        users.forEach((user) => {
+            if (user.id === userid) {
                 newUser = user;
             }
             return true;
@@ -94,26 +97,26 @@ class App extends Component {
 
     followHandler = (followingid) => {
         //const {users, currentUser} = this.state;
-        const {users, currentUser} = this.store.getState();
+        const { users, currentUser } = this.store.getState();
         let followersid = currentUser.id;
         users.map((user) => {
-            if(user.id === followersid){
-                if(user.followingids.indexOf(followingid) < 0){
+            if (user.id === followersid) {
+                if (user.followingids.indexOf(followingid) < 0) {
                     user.following += 1;
                     user.followingids.push(followingid);
-                }else{
+                } else {
                     user.following -= 1;
-                    user.followingids.splice(followingid,1);
+                    user.followingids.splice(followingid, 1);
                 }
             }
 
-            if(user.id === followingid){
-                if(user.followersids.indexOf(followersid) < 0){
+            if (user.id === followingid) {
+                if (user.followersids.indexOf(followersid) < 0) {
                     user.followers += 1;
                     user.followersids.push(followersid);
-                }else{
+                } else {
                     user.followers -= 1;
-                    user.followersids.splice(followersid,1);
+                    user.followersids.splice(followersid, 1);
                 }
             }
             return true;
@@ -124,10 +127,10 @@ class App extends Component {
 
     getUser = (userid) => {
         //const {users} = this.state;
-        const {users} = this.store.getState();
+        const { users } = this.store.getState();
         let user;
         users.some((u) => {
-            if(u.id === userid){
+            if (u.id === userid) {
                 user = u;
                 return true;
             }
@@ -137,12 +140,12 @@ class App extends Component {
     }
     getComments = (postid) => {
         //const{allComments} = this.state;
-        const{allComments} = this.store.getState();
+        const { allComments } = this.store.getState();
         let filteredComments;
         allComments.some((commentObj) => {
-            if(commentObj.postid === postid){
-                    filteredComments = commentObj.comments !== undefined ? commentObj.comments : [];
-                    return true;
+            if (commentObj.postid === postid) {
+                filteredComments = commentObj.comments !== undefined ? commentObj.comments : [];
+                return true;
             }
             return false;
         })
@@ -151,14 +154,14 @@ class App extends Component {
 
     deletePost = (postid) => {
         //const {posts, allComments, currentUser} = this.state;
-        const {posts, allComments, currentUser} = this.store.getState();
+        const { posts, allComments, currentUser } = this.store.getState();
         posts.some((post, i) => {
-            if(post.id === postid){
-                if(post.userid === currentUser.id){
-                    posts.splice(i,1);
+            if (post.id === postid) {
+                if (post.userid === currentUser.id) {
+                    posts.splice(i, 1);
                     allComments.some((postComments, j) => {
-                        if(postComments.postid === postid){
-                            allComments.splice(j,1);
+                        if (postComments.postid === postid) {
+                            allComments.splice(j, 1);
                             return true;
                         }
                         return null;
@@ -175,16 +178,16 @@ class App extends Component {
 
     postLiker = (postid) => {
         //const {posts, currentUser} = this.state;
-        const {posts, currentUser} = this.store.getState();
+        const { posts, currentUser } = this.store.getState();
 
         posts.some((post, i) => {
-            if(post.id === postid){
+            if (post.id === postid) {
                 let Likedindex = currentUser.liked.indexOf(postid)
-                if(!(Likedindex >= 0)){
+                if (!(Likedindex >= 0)) {
                     post.likes += 1;
                     currentUser.liked.push(postid);
                     return null;
-                }else{
+                } else {
                     post.likes -= 1;
                     currentUser.liked.splice(Likedindex, 1);
                     return null;
@@ -198,89 +201,99 @@ class App extends Component {
 
     sortPosts = (sorting, posts) => {
         let sortedPosts;
-        if(sorting === 'timestamp'){
-            sortedPosts = posts.sort(function(obj1, obj2) {
-            	return Date.parse(obj2[sorting]) - Date.parse(obj1[sorting]);
+        if (sorting === 'timestamp') {
+            sortedPosts = posts.sort(function (obj1, obj2) {
+                return Date.parse(obj2[sorting]) - Date.parse(obj1[sorting]);
             });
-        } else{
-            sortedPosts = posts.sort(function(obj1, obj2) {
-            	return obj2[sorting] - obj1[sorting];
+        } else {
+            sortedPosts = posts.sort(function (obj1, obj2) {
+                return obj2[sorting] - obj1[sorting];
             });
         }
         return sortedPosts;
     }
 
     render() {
+        // const [loggedInUser, setLoggedInUser] = useState({});
         //const {sorting, posts, users, currentUser, allComments} = this.state;
-        const {sorting, posts, users, currentUser, allComments} = this.props.store.getState();
+        const { sorting, posts, users, currentUser, allComments } = this.props.store.getState();
         let sortedPosts = this.sortPosts(sorting, posts);
+
         return (
-            <Switch>
-                <Route exact path='/login' render={() => (
-                    <Login
-                        users = {users}
-                        updateCurrentUser = {this.updateCurrentUser}
-                        currentUser = {currentUser}
-                    />
-                )}/>
-                <Route exact path='/' render={() => (
-                    <Home
-                    currentUser = {currentUser}
-                    posts = {sortedPosts}
-                    postLiker = {this.postLiker}
-                    deletePost = {this.deletePost}
-                    sorting = {sorting}
-                    sortPosts = {this.sortPosts}
-                    getUser = {this.getUser}
-                    followHandler = {this.followHandler}
-                    allComments = {allComments}
-                    updateComments = {this.updateComments}
-                    getComments = {this.getComments}
-                    />
-                )}/>
-                <Route exact path='/profile/:userid' render={(props) => (
-                    <Profile
-                    {...props}
-                    currentUser = {currentUser}
-                    getUser = {this.getUser}
-                    posts = {sortedPosts}
-                    sorting = {sorting}
-                    sortPosts = {this.sortPosts}
-                    deletePost = {this.deletePost}
-                    updateSorting = {this.updateSorting}
-                    postLiker = {this.postLiker}
-                    followHandler = {this.followHandler}
-                    />
-                )}/>
-                <Route exact path='/photo/:postid' render={(props) => (
-                    <Photo
-                    {...props}
-                    posts = {sortedPosts}
-                    currentUser = {currentUser}
-                    deletePost = {this.deletePost}
-                    postLiker = {this.postLiker}
-                    getUser = {this.getUser}
-                    followHandler = {this.followHandler}
-                    allComments = {allComments}
-                    updateComments = {this.updateComments}
-                    getComments ={this.getComments}
-                    />
-                )}/>
-                <Route exact path='/comments/:postid' render={(props) => (
-                    <Comments
-                    {...props}
-                    posts = {sortedPosts}
-                    currentUser = {currentUser}
-                    getUser = {this.getUser}
-                    allComments = {allComments}
-                    updateComments = {this.updateComments}
-                    getComments = {this.getComments}
-                    />
-                )}/>
-                <Redirect from='*' to='/' />
-            </Switch>
+
+
+            <UserContext.Provider >
+                {/* <UserContext.Provider value={[loggedInUser, setLoggedInUser]}> */}
+                <Router>
+                    <Switch>
+                        <Route exact path='/login' render={() => (
+                            <Login
+                                users={users}
+                                updateCurrentUser={this.updateCurrentUser}
+                                currentUser={currentUser}
+                            />
+                        )} />
+                        <Route exact path='/' render={() => (
+                            <Home
+                                currentUser={currentUser}
+                                posts={sortedPosts}
+                                postLiker={this.postLiker}
+                                deletePost={this.deletePost}
+                                sorting={sorting}
+                                sortPosts={this.sortPosts}
+                                getUser={this.getUser}
+                                followHandler={this.followHandler}
+                                allComments={allComments}
+                                updateComments={this.updateComments}
+                                getComments={this.getComments}
+                            />
+                         
+                        )} />
+                        <Route exact path='/profile/:userid' render={(props) => (
+                            <Profile
+                                {...props}
+                                currentUser={currentUser}
+                                getUser={this.getUser}
+                                posts={sortedPosts}
+                                sorting={sorting}
+                                sortPosts={this.sortPosts}
+                                deletePost={this.deletePost}
+                                updateSorting={this.updateSorting}
+                                postLiker={this.postLiker}
+                                followHandler={this.followHandler}
+                            />
+                        )} />
+                        <Route exact path='/photo/:postid' render={(props) => (
+                            <Photo
+                                {...props}
+                                posts={sortedPosts}
+                                currentUser={currentUser}
+                                deletePost={this.deletePost}
+                                postLiker={this.postLiker}
+                                getUser={this.getUser}
+                                followHandler={this.followHandler}
+                                allComments={allComments}
+                                updateComments={this.updateComments}
+                                getComments={this.getComments}
+                            />
+                        )} />
+                        <Route exact path='/comments/:postid' render={(props) => (
+                            <Comments
+                                {...props}
+                                posts={sortedPosts}
+                                currentUser={currentUser}
+                                getUser={this.getUser}
+                                allComments={allComments}
+                                updateComments={this.updateComments}
+                                getComments={this.getComments}
+                            />
+                        )} />
+                        <Redirect from='*' to='/' />
+                    </Switch>
+                </Router>
+            </UserContext.Provider>
         );
-        }
     }
+}
 
 export default App;

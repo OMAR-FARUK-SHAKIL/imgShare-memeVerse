@@ -1,7 +1,7 @@
 import React,{ Component } from 'react';
 import { Link } from 'react-router-dom';
 import UserCard from './UserCard';
-import logo from '../img/logo.png';
+// import logo from '../img/logo.png';
 import '../sass/style.scss';
 
 class Login extends Component {
@@ -11,7 +11,9 @@ class Login extends Component {
         return (
         <div className="main">
             <div className="login-logo">
-                <img  src={logo} alt='logo'/>
+                {/* <img  src={logo} alt='logo'/> */}
+                <h1>Meme-Verse</h1>
+                <h3>Share your images!</h3>
             </div>
             <div className="user-list" role="grid">
             { !(Object.keys(this.props.currentUser).length === 0)
