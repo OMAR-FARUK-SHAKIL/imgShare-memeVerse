@@ -11,7 +11,7 @@ This web app is a Instagram like image sharing app and bootstrapped with [Create
 7. uploading image-it does not complete yet.
 
 ## Hosting
-You Live site  from Firebase.
+You see the Live site  from Firebase.
 Code in github.
 
 ### Live site
